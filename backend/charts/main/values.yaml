@@ -1,0 +1,14 @@
+main:
+  image: dappsteros-dashboard-backend
+  replicaCount: 1
+  service:
+    port: 8000
+    nodePort: 30000
+  env:
+    DB_NAME: "dappsteros"
+    DB_USER: "postgres"
+    DB_PASSWORD: "postgres"
+    DB_HOST: "dappsteros-dashboard-postgresql"
+    DB_PORT: "5432"
+    MONGO_HOST: "dappsteros-dashboard-mongo"
+    MONGO_PORT: "27017"

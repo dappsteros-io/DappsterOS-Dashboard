@@ -1,0 +1,68 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: dappsteros-dashboard
+build:
+  artifacts:
+  - image: dappsteros-dashboard-backend
+    context: backend/src
+    docker:
+      dockerfile: Dockerfile
+  - image: dappsteros-dashboard-frontend
+    context: frontend/src
+    sync:
+      manual:
+      - src: 'frontend/src/src/*'
+        dest: .
+    docker:
+      dockerfile: Dockerfile
+manifests:
+  rawYaml:
+  - frontend/k8s/*.yaml
+  # - backend/templates/*.yaml
+  helm:
+    releases:
+    - name: mongo
+      chartPath: backend/charts/mongo
+      valuesFiles:
+      - backend/charts/mongo/values.yaml
+      wait: true
+    - name: postgresql
+      chartPath: backend/charts/postgresql
+      wait: true
+      valuesFiles:
+      - backend/charts/postgresql/values.yaml
+    - name: main
+      chartPath: backend/charts/main
+      wait: true
+      valuesFiles:
+      - backend/charts/main/values.yaml
+      # dependsOn:
+      # - name: mongodb
+      # - name: postgresql
+profiles:
+- name: mix-deploy
+  patches:
+  - op: remove
+    path: /manifests/helm
+  deploy:
+    helm:
+      releases:
+      - name: mongo
+        chartPath: backend/charts/mongo
+        valuesFiles:
+        - backend/charts/mongo/values.yaml
+        wait: true
+      - name: postgresql
+        chartPath: backend/charts/postgresql
+        valuesFiles:
+        - backend/charts/postgresql/values.yaml
+        wait: true
+      - name: main
+        chartPath: backend/charts/main
+        valuesFiles:
+        - backend/charts/main/values.yaml
+        wait: true
+        # dependsOn:
+        # - name: mongodb
+        # - name: postgresql

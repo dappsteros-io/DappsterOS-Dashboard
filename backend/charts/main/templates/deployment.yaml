@@ -1,0 +1,41 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  replicas: {{ .Values.main.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.main.image }}
+        ports:
+          - name: http-server
+            containerPort: {{ .Values.main.service.port }}
+          # - name: debug
+          #  containerPort: {{ .Values.main.service.nodePort }}
+        env:
+          - name: DB_NAME
+            value: {{ .Values.main.env.DB_NAME }}
+          - name: DB_USER
+            value: {{ .Values.main.env.DB_USER }}
+          - name: DB_PASSWORD
+            value: {{ .Values.main.env.DB_PASSWORD }}
+          - name: DB_HOST
+            value: {{ .Values.main.env.DB_HOST }}
+          - name: DB_PORT
+            value: '{{ .Values.main.env.DB_PORT }}'
+          - name: MONGO_HOST
+            value: {{ .Values.main.env.MONGO_HOST }}
+          - name: MONGO_PORT
+            value: '{{ .Values.main.env.MONGO_PORT }}'
