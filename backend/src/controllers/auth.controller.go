@@ -30,36 +30,36 @@ func SignIn(ctx iris.Context) {
 
 	if err != nil {
 		ctx.Problem(iris.NewProblem().
-			// Title("Bad Request").
 			Detail(err.Error()).
 			Key("success", false).
+			Key("message", "The current user is not existing in our database.").
 			Status(iris.StatusNotFound))
 		return
 	}
 
 	if err := user.CheckPassword(cred.Password); err != nil {
 		ctx.Problem(iris.NewProblem().
-			// Title("Bad Request").
 			Detail(err.Error()).
 			Key("success", false).
+			Key("message", "The credential is mismatched.").
 			Status(iris.StatusUnauthorized))
 		return
 	}
 	jwtToken := utils.NewJWT()
-	accessToken, err := jwtToken.CreateToken(time.Hour, iris.Map{"email": user.Email, "id": user.ID.Hex(), "username": user.Username})
+	accessToken, err := jwtToken.CreateToken(time.Hour*24, iris.Map{"email": user.Email, "id": user.ID.Hex(), "username": user.Username})
 	if err != nil {
 		ctx.Problem(iris.NewProblem().
-			// Title("Bad Request").
 			Detail(err.Error()).
 			Key("success", false).
+			Key("message", "Internal server error was occurred.").
 			Status(iris.StatusInternalServerError))
 		return
 	}
 	user.Token = accessToken
 	user.Put()
 	user.Password = ""
-	user.Token = ""
-	ctx.JSON(iris.Map{"success": true, "user": user, "access_token": accessToken})
+	// user.Token = ""
+	ctx.JSON(responses.CommonResponse{Success: true, Data: user, Title: "Welcome!", Detail: "You logged in successfully.", Message: "You logged in successfully."})
 }
 
 func SignUp(ctx iris.Context) {

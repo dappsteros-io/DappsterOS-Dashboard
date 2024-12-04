@@ -15,7 +15,7 @@ type Conn struct {
 
 func (c *Conn) Init() error {
 	// Setup the mgm default config
-	mongoURI := (map[bool]string{true: "mongodb://localhost:27017/dappsteros", false: "mongodb://" + os.Getenv("MONGO_HOST") + ":" + os.Getenv("MONGO_PORT")})[os.Getenv("MONGO_HOST") == ""]
+	mongoURI := (map[bool]string{true: "mongodb://localhost:27017/dappsteros", false: "mongodb://" + os.Getenv("MONGO_HOST") + ":" + os.Getenv("MONGO_PORT") + "/dappsteros"})[os.Getenv("MONGO_HOST") == ""]
 
 	if mongoURI == "" {
 		log.Fatal("DB_ADDR environment variable not specified")

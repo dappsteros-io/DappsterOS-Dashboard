@@ -1,5 +1,6 @@
+"use client";
 import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import {
   ConfigProvider,
@@ -47,12 +48,12 @@ const { Header, Sider } = Layout;
 
 const sideBarItems: MenuProps["items"] = [
   {
-    key: "/home",
+    key: "home",
     icon: <BsRobot />,
     label: `Home`,
   },
   {
-    key: "/home/dashboard",
+    key: "dashboard",
     icon: <BsSpeedometer2 />,
     label: `Dashboard`,
   },
@@ -64,7 +65,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const path = usePathname(); 
+
   const profileItems: MenuProps["items"] = [
     {
       key: "myprofile",
@@ -81,7 +82,7 @@ export default function RootLayout({
       icon: <LogoutOutlined />,
       label: `Logout`,
       onClick: () => {
-        console.log("logout");
+        console.log("logout")
         router.push("/auth/signin");
       },
     },
@@ -92,7 +93,7 @@ export default function RootLayout({
   } = theme.useToken();
 
   const [collapsed, setCollapsed] = useState<boolean>(false);
-  const [selectedkeys, setSelectedkeys] = useState<string[]>([path]);
+  const [selectedkeys, setSelectedkeys] = useState<string[]>(["home"]);
   const [isDarkTheme, setDarkTheme] = useState<boolean>(true);
 
   const onThemeChange = () => {
@@ -105,7 +106,7 @@ export default function RootLayout({
   };
   const onMenuClick = (e: MenuInfo) => {
     setSelectedkeys(e.keyPath);
-    router.push(e.keyPath.reverse().join("/"));
+    router.push("/" + e.keyPath.reverse().join("/"));
   };
 
   const onMenuChange = (e: MenuInfo) => {
@@ -117,17 +118,17 @@ export default function RootLayout({
         <div
           className="h-16 justify-center items-center text-center cursor-pointer flex flex-row gap-4"
           onClick={() => {
-            setSelectedkeys([path]);
+            setSelectedkeys(["home"]);
             router.push("/home");
           }}
         >
-          <Image src={Logo} alt="L" width={48} height={48} priority/>
+          <Image src={Logo} alt="L" width={48} height={48} priority />
           <h2 className={collapsed ? `hidden` : ""}>DappsterOS</h2>
         </div>
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={[path]}
+          defaultSelectedKeys={["home"]}
           selectedKeys={selectedkeys}
           items={sideBarItems}
           onClick={onMenuClick}
@@ -141,83 +142,47 @@ export default function RootLayout({
         token: {
           borderRadius: 0,
           motion: false,
-          colorPrimary:"143b61"
         },
         algorithm: isDarkTheme ? theme.darkAlgorithm : theme.defaultAlgorithm,
       }}
     >
       <LayoutContext.Provider value={{ collapsed, setCollapsed }}>
         <WebSocketProvider url={wsURL}>
-          <Layout hasSider>
-            <Affix offsetTop={0}>
-              <aside>
-                <Drawer
-                  title=""
-                  placement={"left"}
-                  closable={false}
-                  onClose={() => setCollapsed(false)}
-                  open={collapsed}
-                  key={"left"}
-                  size="default"
-                  rootClassName="xs:inline-block md:hidden"
-                  classNames={{
-                    content: "p-0 !bg-[#001529]",
-                    body: "!p-0",
-                  }}
-                  onClick={() => setCollapsed(false)}
-                >
-                  {renderMenu()}
-                </Drawer>
-                <Sider
-                  trigger={null}
-                  // collapsible
-                  collapsed={collapsed}
-                  className="h-screen overflow-auto hidden md:inline-block"
-                  style={{
-                    insetInlineStart: 0,
-                    scrollbarWidth: "thin",
-                    scrollbarColor: "unset",
-                  }}
-                >
-                  {renderMenu()}
-                </Sider>
-              </aside>
-            </Affix>
-            <Layout className="min-h-screen">
-              <Header
-                className="p-0 flex justify-between items-center pr-4"
-                style={{ background: isDarkTheme ? "" : colorBgContainer }}
+          <Layout className="min-h-screen">
+            <Header
+              className="p-0 flex justify-between items-center px-4"
+              style={{ background: isDarkTheme ? "" : colorBgContainer }}
+            >
+            <div
+              className="h-16 justify-center items-center text-center cursor-pointer flex flex-row gap-4"
+              onClick={() => {
+                setSelectedkeys(["home"]);
+                router.push("/home");
+              }}
+            >
+              <Image src={Logo} alt="L" width={48} height={48} priority />
+              <h2 className={collapsed ? `hidden` : ""}>DappsterOS</h2>
+            </div>
+              <Button
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed(!collapsed)}
+                className="!w-16 h-16 text-base invisible"
+              />
+              <Flex
+                align="flex-end"
+                justify="space-between"
+                className="gap-2 items-center"
               >
                 <Button
                   type="text"
-                  icon={
-                    collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
-                  }
-                  onClick={() => setCollapsed(!collapsed)}
+                  icon={isDarkTheme ? <SunOutlined /> : <MoonOutlined />}
+                  onClick={onThemeChange}
                   className="!w-16 h-16 text-base"
                 />
-                <Flex
-                  align="flex-end"
-                  justify="space-between"
-                  className="gap-2 items-center"
-                >
-                  <Button
-                    type="text"
-                    icon={isDarkTheme ? <SunOutlined /> : <MoonOutlined />}
-                    onClick={onThemeChange}
-                    className="!w-16 h-16 text-base"
-                  />
-                  <Dropdown
-                    menu={{ items: profileItems }}
-                    placement="bottomRight"
-                    trigger={["click"]}
-                  >
-                    <Avatar className="w-12 h-12" icon={<UserOutlined />} />
-                  </Dropdown>
-                </Flex>
-              </Header>
-              {children}
-            </Layout>
+              </Flex>
+            </Header>
+            {children}
           </Layout>
         </WebSocketProvider>
       </LayoutContext.Provider>

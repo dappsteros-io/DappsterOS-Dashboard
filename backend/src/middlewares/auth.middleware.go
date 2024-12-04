@@ -26,6 +26,7 @@ func AuthMiddleware(ctx iris.Context) {
 	if access_token == "" {
 		ctx.Problem(iris.NewProblem().
 			Key("success", false).
+			Key("message", "The session is expired or invalid.").
 			Status(iris.StatusUnauthorized))
 		return
 	}
@@ -35,28 +36,31 @@ func AuthMiddleware(ctx iris.Context) {
 	if err != nil {
 		ctx.Problem(iris.NewProblem().
 			Key("success", false).
+			Key("message", "The session is expired or invalid.").
 			Detail(err.Error()).
 			Status(iris.StatusForbidden))
 		return
 	}
 	data := sub.(map[string]any)
+
 	user, err := repo.FindUserByID(data["id"].(string))
 
 	if err != nil {
 		ctx.Problem(iris.NewProblem().
 			Key("success", false).
+			Key("message", "The session is expired or invalid.").
 			Detail(err.Error()).
 			Status(iris.StatusBadRequest))
 		return
 	}
 
-	if user.Token != access_token {
-		ctx.Problem(iris.NewProblem().
-			Key("success", false).
-			Detail("The user belonging to this token no logger exists").
-			Status(iris.StatusBadRequest))
-		return
-	}
+	// if user.Token != access_token {
+	// 	ctx.Problem(iris.NewProblem().
+	// 		Key("success", false).
+	// 		Detail("The user belonging to this token no logger exists").
+	// 		Status(iris.StatusBadRequest))
+	// 	return
+	// }
 	ctx.Values().Set("user", user)
 	ctx.SetUser(user)
 	ctx.Next()

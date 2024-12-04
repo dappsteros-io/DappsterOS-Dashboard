@@ -1,22 +1,34 @@
 "use client";
-console.log(process.env)
+import { notification } from "antd";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
+const host = process.env.NEXT_PUBLIC_API_ADDR;
+const port = process.env.NEXT_PUBLIC_API_PORT;
 
+export const baseURL = `http://${host}:${port}/api/v1/`;
+export const wsURL = `ws://${host}:${port}/`;
 
-let host = process.env.NEXT_PUBLIC_API_ADDR;
-if (typeof window !== 'undefined') {
-  host  = window?.location.hostname;
-}
-export const baseURL = `http://${host}:${process.env.NEXT_PUBLIC_API_PORT}/api/`;
-export const wsURL = `ws://${host}:${process.env.NEXT_PUBLIC_API_PORT}/`;
-export default function api(url: string, config?: any) {
-  return fetch(baseURL + url, {
+export default function api(url: string, config?: AxiosRequestConfig) {
+  return axios(baseURL + url, {
     ...config,
     headers: {
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3NTMzNTA3LCJpYXQiOjE3MjY5Mjg3MDcsImp0aSI6IjZmNmEyYTEzYTVkMzQ4MTdiMWZiMTRlYmEzOWNjNTlhIiwidXNlcl9pZCI6MX0.SJC7ADDb-Fi57EtTHo9JUFAMl6j7Pa1Y1aXcb2dj_Qk",
+      Authorization: "Bearer " + localStorage.getItem("token"),
       "Content-Type": "application/json",
     },
-  }).then((res) => {
-    return res.json();
-  });
+  })
+    .then((res) => {
+      if (res.config.method?.toLowerCase() != "get") {
+        notification.success({
+          message: res?.data?.title,
+          description: res?.data?.message || res?.data?.detail,
+        });
+      }
+      return res.data;
+    })
+    .catch((err: AxiosError) => {
+      notification.error({
+        message: (err?.response?.data as any)?.title,
+        description: (err?.response?.data as any)?.message,
+      });
+      throw new Error((err?.response?.data as any)?.message);
+    });
 }
