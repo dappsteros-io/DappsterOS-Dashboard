@@ -41,7 +41,7 @@ import {
 import Image from "next/image";
 import Logo from "../assets/img/logo.png";
 import LayoutContext from "@/contexts/LayoutContextProvider";
-import { wsURL } from "@/api/index2";
+import { wsURL } from "@/api/index";
  
 
 const { Header, Sider } = Layout;
