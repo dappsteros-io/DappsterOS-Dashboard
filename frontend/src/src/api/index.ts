@@ -4,7 +4,8 @@ import axios, { AxiosError, AxiosRequestConfig } from "axios";
 const host = process.env.NEXT_PUBLIC_API_ADDR;
 const port = process.env.NEXT_PUBLIC_API_PORT;
 
-export const baseURL = `http://${host}:${port}/api/v1/`;
+export const baseURL1 = `http://${host}:${port}/api/v1/`;
+export const baseURL = `/api/v1/`;
 export const wsURL = `ws://${host}:${port}/`;
 
 export default function api(url: string, config?: AxiosRequestConfig) {

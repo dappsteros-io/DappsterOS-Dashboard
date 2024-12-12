@@ -26,4 +26,6 @@ spec:
         - name: PORT
           value: "8080"
         - name: API_ADDR
-          value: dappsteros-dashboard-backend:8000
+          value: dappsteros-dashboard-backend
+        - name: API_PORT
+          value: "8000"

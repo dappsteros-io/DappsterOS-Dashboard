@@ -14,8 +14,11 @@ func ProxmoxAPIRoutes(v1 iris.Party) {
 		proxmoxAPI.Get("/", controllers.Version)
 		proxmoxAPI.Get("/nodes", controllers.GetNodes)
 		proxmoxAPI.Get("/vms", controllers.GetVms)
-		proxmoxAPI.Get("/vm/{vmid}", controllers.GetVM)
-		proxmoxAPI.Post("/vm/{vmid}/start", controllers.StartVM)
-		proxmoxAPI.Post("/vm/{vmid}/stop", controllers.StopVM)
+		proxmoxAPI.Post("/vms", controllers.CreateVM)
+		proxmoxAPI.Get("/vms/{vmid}", controllers.GetVM)
+		proxmoxAPI.Delete("/vms/{vmid}", controllers.DeleteVM)
+		proxmoxAPI.Post("/vms/{vmid}/start", controllers.StartVM)
+		proxmoxAPI.Post("/vms/{vmid}/stop", controllers.StopVM)
+		proxmoxAPI.Post("/vms/{vmid}/install", controllers.InstallDappster)
 	}
 }

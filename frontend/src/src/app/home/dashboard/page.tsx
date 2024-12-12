@@ -1,13 +1,39 @@
 "use client";
 
 import { ClusterData } from "@/types/cluster";
-import type { GetProp, TableProps, TreeDataNode, GetProps } from "antd";
-import { Badge, Button, Flex, Space, Table, Tree } from "antd";
+import type {
+  GetProp,
+  TableProps,
+  TreeDataNode,
+  GetProps,
+  PopconfirmProps,
+} from "antd";
+import {
+  Badge,
+  Button,
+  Flex,
+  message,
+  Popconfirm,
+  Space,
+  Table,
+  Tree,
+} from "antd";
 import React, { useEffect, useState } from "react";
 
-import { DownOutlined } from "@ant-design/icons";
+import {
+  DownOutlined,
+  PlusCircleFilled,
+  PlusSquareOutlined,
+} from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { getNodes, getVMs, startVM, stopVM } from "@/store/proxmox/actions";
+import {
+  getNodes,
+  getVMs,
+  startVM,
+  stopVM,
+  deleteVM,
+  createVM,
+} from "@/store/proxmox/actions";
 import { NodeData, VMData } from "@/types/proxmox";
 import {
   BsDatabase,
@@ -15,8 +41,10 @@ import {
   BsPlayFill,
   BsRepeat,
   BsStop,
+  BsTrash,
 } from "react-icons/bs";
 import { RiRefreshLine } from "react-icons/ri";
+import { VscVm } from "react-icons/vsc";
 
 import Loader from "@/components/Loader";
 type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>;
@@ -97,25 +125,31 @@ const Index: React.FC = () => {
         <Space size="middle">
           <Button
             icon={
-              rec.Status == "stopped" ? (
-                <BsPlayFill color="green" />
-              ) : (
+              rec.Status == "running" ? (
                 <BsStop color="red" />
+              ) : (
+                <BsPlayFill color="green" />
               )
             }
             onClick={() =>
-              rec.Status == "stopped" ? onStartVM(rec.VMID) : onStopVM(rec.VMID)
+              rec.Status == "running" ? onStopVM(rec.VMID) : onStartVM(rec.VMID)
             }
           />
-          {/* <a>
-            <Space>
-              <DownOutlined />
-            </Space>
-          </a> */}
+          <Popconfirm
+            title="Delete the VM"
+            description="Are you sure to delete this VM?"
+            onConfirm={() => onDeleteVM(rec.VMID)}
+            onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button icon={<BsTrash color="red" />} />
+          </Popconfirm>
         </Space>
       ),
     },
   ];
+
   const tableColumns = columns.map((item) => ({ ...item, ellipsis }));
 
   if (xScroll === "fixed") {
@@ -130,6 +164,7 @@ const Index: React.FC = () => {
   if (xScroll) {
     scroll.x = "100vw";
   }
+
   const tableProps: TableProps<ClusterData> = {
     bordered,
     loading,
@@ -142,22 +177,38 @@ const Index: React.FC = () => {
     scroll,
     tableLayout,
   };
+
   const onStartVM = (vmid: number) => {
     dispatch(startVM(vmid)).then((res) => {
       setLoading(true);
-      dispatch(getVMs({})).then((res) => {
-        setLoading(false);
-      });
+      onRefresh();
     });
   };
+
   const onStopVM = (vmid: number) => {
     dispatch(stopVM(vmid)).then((res) => {
       setLoading(true);
-      dispatch(getVMs({})).then((res) => {
-        setLoading(false);
-      });
+      onRefresh();
     });
   };
+
+  const onDeleteVM = (vmid: number) => {
+    dispatch(deleteVM(vmid)).then((res) => {
+      setLoading(true);
+      onRefresh();
+    });
+  };
+
+  const confirm: PopconfirmProps["onConfirm"] = (e) => {
+    console.log(e);
+    message.success("Click on Yes");
+  };
+
+  const cancel: PopconfirmProps["onCancel"] = (e) => {
+    console.log(e);
+    // message.error("Click on No");
+  };
+
   const onSelect: DirectoryTreeProps["onSelect"] = (keys, info) => {
     console.log("Trigger Select", keys, info);
     setLoading(true);
@@ -170,12 +221,22 @@ const Index: React.FC = () => {
   const onExpand: DirectoryTreeProps["onExpand"] = (keys, info) => {
     console.log("Trigger Expand", keys, info);
   };
+
   const onRefresh = () => {
     setLoading(true);
     dispatch(getVMs({})).then((res) => {
       setLoading(false);
     });
   };
+
+  const onCreateVM = () => {
+    setLoading(true);
+    dispatch(createVM({})).then((res) => {
+      setLoading(false);
+      onRefresh();
+    });
+  };
+
   useEffect(() => {
     setLoading(true);
     dispatch(getNodes({})).then((res) => {
@@ -219,7 +280,16 @@ const Index: React.FC = () => {
           <Space style={{ marginBottom: 16 }}>
             <h3>Machines</h3>
             <div className="w-full"></div>
-            <Button icon={<RiRefreshLine />} onClick={onRefresh}></Button>
+            <Button
+              icon={<PlusSquareOutlined />}
+              key={"create"}
+              onClick={onCreateVM}
+            ></Button>
+            <Button
+              icon={<RiRefreshLine />}
+              key={"refresh"}
+              onClick={onRefresh}
+            ></Button>
           </Space>
           <Table<VMData>
             pagination={{ position: ["none", "bottomCenter"] }}

@@ -26,4 +26,7 @@ ENV GOTRACEBACK=single
 
 WORKDIR /app
 COPY --from=build /app/backend /app/backend
+COPY --from=build /app/.env /app/.env
+COPY --from=build /app/cert /app/cert
+
 ENTRYPOINT ["/app/backend"]

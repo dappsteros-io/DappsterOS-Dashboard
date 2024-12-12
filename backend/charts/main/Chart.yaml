@@ -1,5 +1,5 @@
 apiVersion: v2
-description: back end for dappsteros dashboard
-name: dappsteros-dashboard-main
+description: backend for dappsteros dashboard
+name: dappsteros-dashboard-backend
 version: 0.1.0
 appVersion: 0.1.0

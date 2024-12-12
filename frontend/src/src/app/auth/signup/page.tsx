@@ -5,7 +5,7 @@ import type { FormProps } from "antd";
 import { Button, Form, Input, Card, Layout } from "antd";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/lib/hooks";
-import { signIn } from "@/store/user/actions";
+import { signIn, signUp } from "@/store/user/actions";
 import Link from "next/link";
 
 type FieldType = {
@@ -19,7 +19,7 @@ const SignUp: React.FC = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    dispatch(signIn(values));
+    dispatch(signUp(values));
     // router.push("/home")
   };
 

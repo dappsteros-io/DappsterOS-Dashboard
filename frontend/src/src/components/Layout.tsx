@@ -147,7 +147,7 @@ export default function RootLayout({
       }}
     >
       <LayoutContext.Provider value={{ collapsed, setCollapsed }}>
-        <WebSocketProvider url={wsURL}>
+        {/* <WebSocketProvider url={wsURL}> */}
           <Layout hasSider>
             <Affix offsetTop={0}>
               <aside>
@@ -219,7 +219,7 @@ export default function RootLayout({
               {children}
             </Layout>
           </Layout>
-        </WebSocketProvider>
+        {/* </WebSocketProvider> */}
       </LayoutContext.Provider>
     </ConfigProvider>
   );
