@@ -20,5 +20,6 @@ func ProxmoxAPIRoutes(v1 iris.Party) {
 		proxmoxAPI.Post("/vms/{vmid}/start", controllers.StartVM)
 		proxmoxAPI.Post("/vms/{vmid}/stop", controllers.StopVM)
 		proxmoxAPI.Post("/vms/{vmid}/install", controllers.InstallDappster)
+		proxmoxAPI.Get("/vms/{vmid}/status", controllers.GetDappsterStatus)
 	}
 }

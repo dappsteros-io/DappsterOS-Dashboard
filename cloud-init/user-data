@@ -13,7 +13,7 @@ autoinstall:
   - qemu-guest-agent
   late-commands:
   # - curtin in-target --target=/target apt upgrade -y
-  - curtin in-target --target=/target apt update
-  - curtin in-target --target=/target apt install -y qemu-guest-agent
-  - curtin in-target --target=/target systemctl enable qemu-guest-agent
-  - curtin in-target --target=/target systemctl start qemu-guest-agent
+  - curtin in-target --target=/target -- apt update
+  - curtin in-target --target=/target -- apt install -y qemu-guest-agent
+  - curtin in-target --target=/target -- systemctl enable qemu-guest-agent
+  - curtin in-target --target=/target -- systemctl start qemu-guest-agent
