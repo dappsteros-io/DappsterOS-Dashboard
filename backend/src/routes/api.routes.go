@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/routes/v1"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/routes/v1"
 	"github.com/kataras/iris/v12/core/router"
 )
 

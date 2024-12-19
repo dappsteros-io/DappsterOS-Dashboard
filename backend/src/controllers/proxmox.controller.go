@@ -8,8 +8,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/requests"
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/responses"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/requests"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/responses"
 	"github.com/kataras/iris/v12"
 	"github.com/luthermonson/go-proxmox"
 )

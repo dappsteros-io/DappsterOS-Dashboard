@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/models"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/models"
 	"github.com/kataras/iris/v12"
 )
 

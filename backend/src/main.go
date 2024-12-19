@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/db"
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/routes"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/db"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/routes"
 	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris/v12"
 

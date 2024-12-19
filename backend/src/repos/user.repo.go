@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/models"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/models"
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

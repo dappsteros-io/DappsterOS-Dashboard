@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/controllers"
-	middleware "github.com/dappster-io/DappsterOS-Dashboard/backend/src/middlewares"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/controllers"
+	middleware "github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/middlewares"
 	"github.com/kataras/iris/v12"
 )
 

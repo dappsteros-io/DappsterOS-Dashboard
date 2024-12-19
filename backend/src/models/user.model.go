@@ -3,7 +3,7 @@ package models
 import (
 	"log"
 
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/utils"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/utils"
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
 )

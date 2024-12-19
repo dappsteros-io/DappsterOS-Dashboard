@@ -4,11 +4,11 @@ import (
 	"log"
 	"time"
 
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/models"
-	repo "github.com/dappster-io/DappsterOS-Dashboard/backend/src/repos"
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/requests"
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/responses"
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/utils"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/models"
+	repo "github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/repos"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/requests"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/responses"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/utils"
 	"github.com/kamva/mgm/v3"
 	"github.com/kataras/iris/v12"
 )

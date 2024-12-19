@@ -1,8 +1,6 @@
-module github.com/dappster-io/DappsterOS-Dashboard/backend/src
+module github.com/dappsteros-io/DappsterOS-Dashboard/backend/src
 
-go 1.23
-
-toolchain go1.23.3
+go 1.23.3
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -12,7 +10,7 @@ require (
 	github.com/kataras/iris/v12 v12.2.11
 	github.com/luthermonson/go-proxmox v0.2.1
 	go.mongodb.org/mongo-driver v1.17.1
-	golang.org/x/crypto v0.27.0
+	golang.org/x/crypto v0.31.0
 )
 
 require (
@@ -66,9 +64,9 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
 	golang.org/x/net v0.29.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/djherbis/times.v1 v1.2.0 // indirect

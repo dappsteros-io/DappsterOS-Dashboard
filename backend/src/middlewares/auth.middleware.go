@@ -3,8 +3,8 @@ package middleware
 import (
 	"strings"
 
-	repo "github.com/dappster-io/DappsterOS-Dashboard/backend/src/repos"
-	"github.com/dappster-io/DappsterOS-Dashboard/backend/src/utils"
+	repo "github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/repos"
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/utils"
 	"github.com/kataras/iris/v12"
 )
 
