@@ -8,6 +8,8 @@ import (
 	"os"
 	"strconv"
 
+	"encoding/json"
+
 	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/requests"
 	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/responses"
 	"github.com/kataras/iris/v12"
@@ -317,13 +319,12 @@ func InstallDappster(ctx iris.Context) {
 		return
 	}
 
-	pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "curl 10.69.12.99:8080 | sudo bash")
-	// pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "wget -qO- http://get.dappster.io:8080/ ")
+	// pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "curl 10.69.12.99:8080 | sudo bash")
+	pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "wget -qO- http://get.dappster.io:8080/ | sudo bash")
 	fmt.Println(pid)
 	s, err := vm.WaitForAgentExecExit(context.Background(), pid, 1800)
 	fmt.Println(s)
 	fmt.Println(pid)
-
 	if err != nil {
 		ctx.Problem(iris.NewProblem().
 			Detail(err.Error()).
@@ -342,8 +343,8 @@ func GetDappsterStatus(ctx iris.Context) {
 	}
 
 	vmId, err := strconv.Atoi(ctx.Params().Get("vmid"))
-	pid, err := strconv.Atoi(ctx.URLParam("pid"))
-	fmt.Println(vmId, pid)
+	// pid, err := strconv.Atoi(ctx.URLParam("pid"))
+	// fmt.Println(vmId, pid)
 	if err != nil {
 		ctx.Problem(iris.NewProblem().
 			Detail(err.Error()).
@@ -375,6 +376,7 @@ func GetDappsterStatus(ctx iris.Context) {
 		return
 	}
 
+	pid, err := vm.AgentExec(context.Background(), []string{"curl", "-s", "http://localhost/v1/users/status"}, "")
 	s, err := vm.AgentExecStatus(context.Background(), pid)
 	fmt.Println(s)
 	fmt.Println(pid)
@@ -383,12 +385,23 @@ func GetDappsterStatus(ctx iris.Context) {
 		ctx.Problem(iris.NewProblem().
 			Detail(err.Error()).
 			Key("success", false).
-			Key("message", "Internal Server Error").
+			Key("message", "Cannot find the DappsterOS...").
 			Status(iris.StatusInternalServerError))
 		return
 	}
 
-	ctx.JSON(responses.CommonResponse{Success: true, Data: s, Message: "Success", Title: "Installing Dappster", Detail: "Installing DappsterOS in your machine.."})
+	var result map[string]interface{}
+	err = json.Unmarshal([]byte(s.OutData), &result)
+
+	if err != nil {
+		ctx.Problem(iris.NewProblem().
+			Detail(err.Error()).
+			Key("success", false).
+			Key("message", "Cannot find the DappsterOS...").
+			Status(iris.StatusInternalServerError))
+		return
+	}
+	ctx.JSON(responses.CommonResponse{Success: true, Data: result, Message: "The DappsterOS is running on your pc...", Title: "DappsterOS Running", Detail: "DappsterOS is running on your machine"})
 
 }
 
