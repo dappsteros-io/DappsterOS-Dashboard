@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ .Chart.Name }}
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: {{ .Chart.Name }}
   ports:

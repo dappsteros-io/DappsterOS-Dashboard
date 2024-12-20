@@ -97,7 +97,7 @@ func SignUp(ctx iris.Context) {
 		return
 	}
 	user.Password = ""
-	ctx.JSON(iris.Map{"success": true, "user": user})
+	ctx.JSON(iris.Map{"success": true, "user": user, "title": "Welcome", "message": "Registration succeeded!", "detail": "Registration succeeded!"})
 }
 
 func GetUsers(ctx iris.Context) {

@@ -6,7 +6,8 @@ EXPOSE 3000
 COPY package* ./
 RUN npm install --no-package-lock
 COPY . .
-CMD ["npm", "run", "dev"]
+RUN npm run build
+CMD ["npm", "run", "start"]
 
 # RUN \
 #     if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
