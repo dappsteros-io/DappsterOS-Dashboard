@@ -1,14 +1,13 @@
 "use client";
 
 import { ClusterData } from "@/types/cluster";
-import type {
+import {
   GetProp,
   TableProps,
   TreeDataNode,
   GetProps,
   PopconfirmProps,
-} from "antd";
-import {
+  Tooltip,
   Badge,
   Button,
   Flex,
@@ -33,9 +32,13 @@ import {
   stopVM,
   deleteVM,
   createVM,
+  installDappster,
+  checkDappster,
 } from "@/store/proxmox/actions";
 import { NodeData, VMData } from "@/types/proxmox";
 import {
+  BsBackpack,
+  BsCheck2All,
   BsDatabase,
   BsPlay,
   BsPlayFill,
@@ -123,18 +126,36 @@ const Index: React.FC = () => {
       key: "action",
       render: (val, rec, index) => (
         <Space size="middle">
-          <Button
-            icon={
-              rec.Status == "running" ? (
-                <BsStop color="red" />
-              ) : (
-                <BsPlayFill color="green" />
-              )
-            }
-            onClick={() =>
-              rec.Status == "running" ? onStopVM(rec.VMID) : onStartVM(rec.VMID)
-            }
-          />
+          <Tooltip title={rec.Status == "running" ? "Stop" : "Start"}>
+            <Button
+              icon={
+                rec.Status == "running" ? (
+                  <BsStop color="red" />
+                ) : (
+                  <BsPlayFill color="green" />
+                )
+              }
+              onClick={() =>
+                rec.Status == "running"
+                  ? onStopVM(rec.VMID)
+                  : onStartVM(rec.VMID)
+              }
+            />
+          </Tooltip>
+          <Tooltip title="Install DappsterOS">
+            <Button
+              disabled={rec.Status !== "running"}
+              icon={<BsBackpack />}
+              onClick={() => onInstallDappsterOS(rec.VMID)}
+            />
+          </Tooltip>
+          <Tooltip title="Check DappsterOS">
+            <Button
+              disabled={rec.Status !== "running"}
+              icon={<BsCheck2All />}
+              onClick={() => onCheckDappsterOS(rec.VMID)}
+            />
+          </Tooltip>
           <Popconfirm
             title="Delete the VM"
             description="Are you sure to delete this VM?"
@@ -143,7 +164,9 @@ const Index: React.FC = () => {
             okText="Yes"
             cancelText="No"
           >
-            <Button icon={<BsTrash color="red" />} />
+            <Tooltip title="Remove VM">
+              <Button icon={<BsTrash color="red" />} />
+            </Tooltip>
           </Popconfirm>
         </Space>
       ),
@@ -199,6 +222,21 @@ const Index: React.FC = () => {
     });
   };
 
+  const onInstallDappsterOS = (vmid: number) => {
+    setLoading(true);
+    dispatch(installDappster(vmid)).then((res) => {
+      setLoading(false);
+      onRefresh();
+    });
+  };
+
+  const onCheckDappsterOS = (vmid: number) => {
+    setLoading(true);
+    dispatch(checkDappster(vmid)).then((res) => {
+      setLoading(false);
+      // onRefresh();
+    });
+  };
   const confirm: PopconfirmProps["onConfirm"] = (e) => {
     console.log(e);
     message.success("Click on Yes");
@@ -277,19 +315,28 @@ const Index: React.FC = () => {
           </div>
         </Flex> */}
         <Flex align="start" className="flex-col">
-          <Space style={{ marginBottom: 16 }}>
-            <h3>Machines</h3>
-            <div className="w-full"></div>
-            <Button
-              icon={<PlusSquareOutlined />}
-              key={"create"}
-              onClick={onCreateVM}
-            ></Button>
-            <Button
-              icon={<RiRefreshLine />}
-              key={"refresh"}
-              onClick={onRefresh}
-            ></Button>
+          <Space
+            style={{ marginBottom: 16 }}
+            className="w-full flex justify-between"
+          >
+            <h3>Your Machines</h3>
+            <div className="w-full flex-1"></div>
+            <Button.Group>
+              <Button
+                icon={<PlusSquareOutlined />}
+                key={"create"}
+                onClick={onCreateVM}
+              >
+                Create New VM
+              </Button>
+              <Button
+                icon={<RiRefreshLine />}
+                key={"refresh"}
+                onClick={onRefresh}
+              >
+                Reload
+              </Button>
+            </Button.Group>
           </Space>
           <Table<VMData>
             pagination={{ position: ["none", "bottomCenter"] }}

@@ -8,6 +8,8 @@ import {
   start_vm,
   stop_vm,
   delete_vm,
+  install_dappster,
+  check_dappster,
 } from "./api";
 
 export const getNodes = createAsyncThunk<any, any>(
@@ -31,6 +33,16 @@ export const createVM = createAsyncThunk<any, any>(
 export const startVM = createAsyncThunk<any, any>(
   "proxmox/startVM",
   async (data) => start_vm(data)
+);
+
+export const installDappster = createAsyncThunk<any, any>(
+  "proxmox/installDappster",
+  async (data) => install_dappster(data)
+);
+
+export const checkDappster = createAsyncThunk<any, any>(
+  "proxmox/checkDappster",
+  async (data) => check_dappster(data)
 );
 
 export const stopVM = createAsyncThunk<any, any>(

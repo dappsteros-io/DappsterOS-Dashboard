@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/lib/hooks";
 import { signIn, signUp } from "@/store/user/actions";
 import Link from "next/link";
+import { ROUTE } from "@/routes";
 
 type FieldType = {
   email?: string;
@@ -19,8 +20,9 @@ const SignUp: React.FC = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    dispatch(signUp(values));
-    // router.push("/home")
+    dispatch(signUp(values)).then((res) => {
+      router.push(ROUTE.signin);
+    });
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -78,9 +80,7 @@ const SignUp: React.FC = () => {
           <Form.Item label={null}>
             Already have an account?
             <Link href="/auth/signin">
-              <Button type="link">
-                Sign in
-              </Button>
+              <Button type="link">Sign in</Button>
             </Link>
           </Form.Item>
         </Form>

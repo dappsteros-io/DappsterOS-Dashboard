@@ -27,6 +27,7 @@ import {
   UserOutlined,
   LinkedinOutlined,
   LogoutOutlined,
+  UserAddOutlined,
 } from "@ant-design/icons";
 
 import {
@@ -42,7 +43,7 @@ import Image from "next/image";
 import Logo from "../assets/img/logo.png";
 import LayoutContext from "@/contexts/LayoutContextProvider";
 import { wsURL } from "@/api/index";
- 
+import { ROUTE } from "@/routes";
 
 const { Header, Sider } = Layout;
 
@@ -82,7 +83,7 @@ export default function RootLayout({
       icon: <LogoutOutlined />,
       label: `Logout`,
       onClick: () => {
-        console.log("logout")
+        console.log("logout");
         router.push("/auth/signin");
       },
     },
@@ -93,7 +94,7 @@ export default function RootLayout({
   } = theme.useToken();
 
   const [collapsed, setCollapsed] = useState<boolean>(false);
-  const [selectedkeys, setSelectedkeys] = useState<string[]>(["home"]);
+  // const [selectedkeys, setSelectedkeys] = useState<string[]>(["home"]);
   const [isDarkTheme, setDarkTheme] = useState<boolean>(true);
 
   const onThemeChange = () => {
@@ -104,38 +105,7 @@ export default function RootLayout({
     }
     setDarkTheme(!isDarkTheme);
   };
-  const onMenuClick = (e: MenuInfo) => {
-    setSelectedkeys(e.keyPath);
-    router.push("/" + e.keyPath.reverse().join("/"));
-  };
 
-  const onMenuChange = (e: MenuInfo) => {
-    console.log({ e });
-  };
-  const renderMenu = () => {
-    return (
-      <>
-        <div
-          className="h-16 justify-center items-center text-center cursor-pointer flex flex-row gap-4"
-          onClick={() => {
-            setSelectedkeys(["home"]);
-            router.push("/home");
-          }}
-        >
-          <Image src={Logo} alt="L" width={48} height={48} priority />
-          <h2 className={collapsed ? `hidden` : ""}>DappsterOS</h2>
-        </div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["home"]}
-          selectedKeys={selectedkeys}
-          items={sideBarItems}
-          onClick={onMenuClick}
-        />
-      </>
-    );
-  };
   return (
     <ConfigProvider
       theme={{
@@ -153,16 +123,16 @@ export default function RootLayout({
               className="p-0 flex justify-between items-center px-4"
               style={{ background: isDarkTheme ? "" : colorBgContainer }}
             >
-            <div
-              className="h-16 justify-center items-center text-center cursor-pointer flex flex-row gap-4"
-              onClick={() => {
-                setSelectedkeys(["home"]);
-                router.push("/home");
-              }}
-            >
-              <Image src={Logo} alt="L" width={48} height={48} priority />
-              <h2 className={collapsed ? `hidden` : ""}>DappsterOS</h2>
-            </div>
+              <div
+                className="h-16 justify-center items-center text-center cursor-pointer flex flex-row gap-4"
+                onClick={() => {
+                  // setSelectedkeys(["home"]);
+                  router.push(ROUTE.landing);
+                }}
+              >
+                <Image src={Logo} alt="L" width={48} height={48} priority />
+                <h2 className={collapsed ? `hidden` : ""}>DappsterOS</h2>
+              </div>
               <Button
                 type="text"
                 icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -180,6 +150,22 @@ export default function RootLayout({
                   onClick={onThemeChange}
                   className="!w-16 h-16 text-base"
                 />
+                <Button
+                  type="link"
+                  icon={<UserOutlined />}
+                  onClick={() => router.push(ROUTE.signin)}
+                  className=" text-base"
+                >
+                  Login
+                </Button>
+                <Button
+                  type="link"
+                  icon={<UserAddOutlined />}
+                  onClick={() => router.push(ROUTE.signup)}
+                  className=" text-base"
+                >
+                  Register
+                </Button>
               </Flex>
             </Header>
             {children}

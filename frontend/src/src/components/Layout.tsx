@@ -41,7 +41,6 @@ import Image from "next/image";
 import Logo from "../assets/img/logo.png";
 import LayoutContext from "@/contexts/LayoutContextProvider";
 import { wsURL } from "@/api/index";
- 
 
 const { Header, Sider } = Layout;
 
@@ -64,7 +63,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const path = usePathname(); 
+  const path = usePathname();
   const profileItems: MenuProps["items"] = [
     {
       key: "myprofile",
@@ -121,7 +120,7 @@ export default function RootLayout({
             router.push("/home");
           }}
         >
-          <Image src={Logo} alt="L" width={48} height={48} priority/>
+          <Image src={Logo} alt="L" width={48} height={48} priority />
           <h2 className={collapsed ? `hidden` : ""}>DappsterOS</h2>
         </div>
         <Menu
@@ -141,84 +140,82 @@ export default function RootLayout({
         token: {
           borderRadius: 0,
           motion: false,
-          colorPrimary:"143b61"
+          colorPrimary: "143b61",
         },
         algorithm: isDarkTheme ? theme.darkAlgorithm : theme.defaultAlgorithm,
       }}
     >
       <LayoutContext.Provider value={{ collapsed, setCollapsed }}>
         {/* <WebSocketProvider url={wsURL}> */}
-          <Layout hasSider>
-            <Affix offsetTop={0}>
-              <aside>
-                <Drawer
-                  title=""
-                  placement={"left"}
-                  closable={false}
-                  onClose={() => setCollapsed(false)}
-                  open={collapsed}
-                  key={"left"}
-                  size="default"
-                  rootClassName="xs:inline-block md:hidden"
-                  classNames={{
-                    content: "p-0 !bg-[#001529]",
-                    body: "!p-0",
-                  }}
-                  onClick={() => setCollapsed(false)}
-                >
-                  {renderMenu()}
-                </Drawer>
-                <Sider
-                  trigger={null}
-                  // collapsible
-                  collapsed={collapsed}
-                  className="h-screen overflow-auto hidden md:inline-block"
-                  style={{
-                    insetInlineStart: 0,
-                    scrollbarWidth: "thin",
-                    scrollbarColor: "unset",
-                  }}
-                >
-                  {renderMenu()}
-                </Sider>
-              </aside>
-            </Affix>
-            <Layout className="min-h-screen">
-              <Header
-                className="p-0 flex justify-between items-center pr-4"
-                style={{ background: isDarkTheme ? "" : colorBgContainer }}
+        <Layout hasSider>
+          <Affix offsetTop={0}>
+            <aside>
+              <Drawer
+                title=""
+                placement={"left"}
+                closable={false}
+                onClose={() => setCollapsed(false)}
+                open={collapsed}
+                key={"left"}
+                size="default"
+                rootClassName="xs:inline-block"
+                classNames={{
+                  content: "p-0 !bg-[#001529]",
+                  body: "!p-0",
+                }}
+                onClick={() => setCollapsed(false)}
+              >
+                {renderMenu()}
+              </Drawer>
+              <Sider
+                trigger={null}
+                // collapsible
+                collapsed={collapsed}
+                className="h-screen overflow-auto hidden md:inline-block"
+                style={{
+                  insetInlineStart: 0,
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "unset",
+                }}
+              >
+                {renderMenu()}
+              </Sider>
+            </aside>
+          </Affix>
+          <Layout className="min-h-screen">
+            <Header
+              className="p-0 flex justify-between items-center pr-4"
+              style={{ background: isDarkTheme ? "" : colorBgContainer }}
+            >
+              <Button
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed(!collapsed)}
+                className="!w-16 h-16 text-base"
+              />
+              <Flex
+                align="flex-end"
+                justify="space-between"
+                className="gap-2 items-center"
               >
                 <Button
                   type="text"
-                  icon={
-                    collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
-                  }
-                  onClick={() => setCollapsed(!collapsed)}
+                  icon={isDarkTheme ? <SunOutlined /> : <MoonOutlined />}
+                  onClick={onThemeChange}
                   className="!w-16 h-16 text-base"
                 />
-                <Flex
-                  align="flex-end"
-                  justify="space-between"
-                  className="gap-2 items-center"
+                <Dropdown
+                  menu={{ items: profileItems }}
+                  placement="bottomRight"
+                  trigger={["click"]}
                 >
-                  <Button
-                    type="text"
-                    icon={isDarkTheme ? <SunOutlined /> : <MoonOutlined />}
-                    onClick={onThemeChange}
-                    className="!w-16 h-16 text-base"
-                  />
-                  <Dropdown
-                    menu={{ items: profileItems }}
-                    placement="bottomRight"
-                    trigger={["click"]}
-                  >
-                    <Avatar className="w-12 h-12" icon={<UserOutlined />} />
-                  </Dropdown>
-                </Flex>
-              </Header>
-              {children}
-            </Layout>
+                  <Avatar className="w-12 h-12" icon={<UserOutlined />} />
+                </Dropdown>
+              </Flex>
+            </Header>
+            {children}
           </Layout>
+        </Layout>
         {/* </WebSocketProvider> */}
       </LayoutContext.Provider>
     </ConfigProvider>

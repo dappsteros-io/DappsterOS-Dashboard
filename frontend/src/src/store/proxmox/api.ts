@@ -17,6 +17,13 @@ export const create_vm = (data: any) => {
 export const start_vm = (vmid: number) => {
   return api(`proxmox/vms/${vmid}/start`, { method: "POST" });
 };
+export const install_dappster = (vmid: number) => {
+  return api(`proxmox/vms/${vmid}/install`, { method: "POST" });
+};
+
+export const check_dappster = (vmid: number) => {
+  return api(`proxmox/vms/${vmid}/status`, { method: "POST" });
+};
 
 export const stop_vm = (vmid: number) => {
   return api(`proxmox/vms/${vmid}/stop`, { method: "POST" });
