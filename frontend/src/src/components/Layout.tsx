@@ -107,9 +107,6 @@ export default function RootLayout({
     router.push(e.keyPath.reverse().join("/"));
   };
 
-  const onMenuChange = (e: MenuInfo) => {
-    console.log({ e });
-  };
   const renderMenu = () => {
     return (
       <>
@@ -147,41 +144,22 @@ export default function RootLayout({
     >
       <LayoutContext.Provider value={{ collapsed, setCollapsed }}>
         {/* <WebSocketProvider url={wsURL}> */}
-        <Layout hasSider>
-          <Affix offsetTop={0}>
-            <aside>
-              <Drawer
-                title=""
-                placement={"left"}
-                closable={false}
-                onClose={() => setCollapsed(false)}
-                open={collapsed}
-                key={"left"}
-                size="default"
-                rootClassName="xs:inline-block"
-                classNames={{
-                  content: "p-0 !bg-[#001529]",
-                  body: "!p-0",
-                }}
-                onClick={() => setCollapsed(false)}
-              >
-                {renderMenu()}
-              </Drawer>
-              <Sider
-                trigger={null}
-                // collapsible
-                collapsed={collapsed}
-                className="h-screen overflow-auto hidden md:inline-block"
-                style={{
-                  insetInlineStart: 0,
-                  scrollbarWidth: "thin",
-                  scrollbarColor: "unset",
-                }}
-              >
-                {renderMenu()}
-              </Sider>
-            </aside>
-          </Affix>
+        <Layout>
+          <Sider
+            className="h-screen overflow-auto"
+            breakpoint="lg"
+            collapsedWidth="0"
+            collapsed={collapsed}
+            collapsible
+            onBreakpoint={(broken) => {
+              console.log(broken);
+            }}
+            onCollapse={(collapsed, type) => {
+              setCollapsed(collapsed);
+            }}
+          >
+            {renderMenu()}
+          </Sider>
           <Layout className="min-h-screen">
             <Header
               className="p-0 flex justify-between items-center pr-4"

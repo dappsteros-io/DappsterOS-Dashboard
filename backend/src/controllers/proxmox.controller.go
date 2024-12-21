@@ -334,7 +334,7 @@ func InstallDappster(ctx iris.Context) {
 		return
 	}
 
-	ctx.JSON(responses.CommonResponse{Success: true, Data: s, Message: "Success", Title: "Installing Dappster", Detail: "Installing DappsterOS in your machine.."})
+	ctx.JSON(responses.CommonResponse{Success: true, Data: s, Message: "Success", Title: "Installing DappsterOS", Detail: fmt.Sprintf("Installing DappsterOS on %s...", vm.Name)})
 }
 
 func GetDappsterStatus(ctx iris.Context) {
@@ -385,7 +385,7 @@ func GetDappsterStatus(ctx iris.Context) {
 		ctx.Problem(iris.NewProblem().
 			Detail(err.Error()).
 			Key("success", false).
-			Key("message", "Cannot find the DappsterOS...").
+			Key("message", fmt.Sprintf("Cannot find the DappsterOS on %s", vm.Name)).
 			Status(iris.StatusInternalServerError))
 		return
 	}
@@ -397,11 +397,11 @@ func GetDappsterStatus(ctx iris.Context) {
 		ctx.Problem(iris.NewProblem().
 			Detail(err.Error()).
 			Key("success", false).
-			Key("message", "Cannot find the DappsterOS...").
+			Key("message", fmt.Sprintf("Cannot find the DappsterOS on %s", vm.Name)).
 			Status(iris.StatusInternalServerError))
 		return
 	}
-	ctx.JSON(responses.CommonResponse{Success: true, Data: result, Message: "The DappsterOS is running on your pc...", Title: "DappsterOS Running", Detail: "DappsterOS is running on your machine"})
+	ctx.JSON(responses.CommonResponse{Success: true, Data: result, Message: fmt.Sprintf("DappsterOS is running on %s", vm.Name), Title: "DappsterOS Running", Detail: fmt.Sprintf("DappsterOS is running on %s", vm.Name)})
 
 }
 
