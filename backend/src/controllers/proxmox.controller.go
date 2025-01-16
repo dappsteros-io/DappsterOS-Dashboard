@@ -358,7 +358,9 @@ func InstallDappster(ctx iris.Context) {
 		// 	return
 		// }
 		// pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "curl 10.69.12.99:8080 | sudo bash")
-		pid2, err := vm.AgentExec(context.Background(), []string{"bash"}, "wget -qO- http://get.dappster.io:8080/ | sudo bash")
+		pid2, err := vm.AgentExec(context.Background(), []string{"bash"}, "sudo rm -rf /tmp/dappster-installer/")
+
+		pid2, err = vm.AgentExec(context.Background(), []string{"bash"}, "wget -qO- http://get.dappster.io:8080/ | sudo bash")
 
 		// s2, err := vm.WaitForAgentExecExit(context.Background(), pid2, 1800)
 		// fmt.Println(s2)
