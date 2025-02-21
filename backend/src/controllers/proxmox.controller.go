@@ -187,6 +187,14 @@ func DeleteVM(ctx iris.Context) {
 			Status(iris.StatusInternalServerError))
 		return
 	}
+	if vmId == 100 {
+
+		ctx.Problem(iris.NewProblem().
+			Key("success", false).
+			Key("message", "This vm can not be deleted").
+			Status(iris.StatusBadRequest))
+		return
+	}
 	vm, err := node.VirtualMachine(context.Background(), vmId)
 	if err != nil {
 		ctx.Problem(iris.NewProblem().
