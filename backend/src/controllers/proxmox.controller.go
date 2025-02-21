@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"encoding/json"
 
+	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/models"
 	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/requests"
 	"github.com/dappsteros-io/DappsterOS-Dashboard/backend/src/responses"
 	"github.com/kataras/iris/v12"
@@ -41,7 +43,7 @@ func Init() {
 	client = proxmox.NewClient(proxmoxURL,
 		proxmox.WithHTTPClient(&insecureHTTPClient),
 		proxmox.WithAPIToken(tokenID, secret),
-		// proxmox.WithCredentials(&credentials)
+		// proxmox.WithCredentials(&credentials),
 	)
 
 }
@@ -240,13 +242,20 @@ func CreateVM(ctx iris.Context) {
 		}
 	}
 
+	sss, _ := node.StorageISO(context.Background())
+	iso, _ := sss.ISO(context.Background(), "jammy-server-cloudimg-amd64-disk-kvm.img")
+	println(iso.VolID)
+
+	sss2, _ := node.Storage(context.Background(), "local-lvm")
+	iso2, _ := sss2.ISO(context.Background(), "jammy-server-cloudimg-amd64-disk-kvm.img")
+	println(iso2)
 	// Define VM options
 	options := []proxmox.VirtualMachineOption{
 		{Name: "agent", Value: "1"},
 		{Name: "autostart", Value: 1},
 		{Name: "cpu", Value: "x86-64-v2-AES"},
-		{Name: "ide0", Value: "local:iso/seed.iso,media=cdrom"},
-		{Name: "ide2", Value: "local:iso/ubuntu-24.04.1-live-server-amd64.iso,media=cdrom"},
+		// {Name: "ide0", Value: "local:iso/seed.iso,media=cdrom"},
+		// {Name: "ide2", Value: "local:iso/ubuntu-20.04.6-live-server-amd64.iso,media=cdrom"},
 		{Name: "machine", Value: "q35"},
 		{Name: "memory", Value: "16535"},
 		{Name: "net0", Value: "virtio,bridge=vmbr0,firewall=1"},
@@ -254,8 +263,9 @@ func CreateVM(ctx iris.Context) {
 		{Name: "onboot", Value: 1},
 		{Name: "ostype", Value: "l26"},
 		{Name: "cores", Value: 2},
-		{Name: "scsihw", Value: "virtio-scsi-single"},
+		{Name: "scsihw", Value: "virtio-scsi-pci"},
 		{Name: "scsi0", Value: "local:32,format=qcow2,iothread=on"},
+		// {Name: "scsi0", Value: "local:32,import-from=/root/jammy-server-cloudimg-amd64-disk-kvm.img"},
 		{Name: "start", Value: 1},
 		{Name: "sockets", Value: 2},
 		{Name: "boot", Value: "order=scsi0;ide0;ide2;net0"},
@@ -269,14 +279,107 @@ func CreateVM(ctx iris.Context) {
 			Key("success", false).
 			Key("message", "Internal Server Error").
 			Status(iris.StatusInternalServerError))
+		return
 	}
+
 	// vm, err := node.VirtualMachine(context.Background(), lastVmId+1)
 	// if err != nil {
 	// }
-
 	// vm.Start(context.Background())
-
+	// storage, _ :=node.Storage(context.Background(), "local-")
+	// storage.ISO()
 	ctx.JSON(responses.CommonResponse{Success: true, Data: t, Message: fmt.Sprintf("VM %d was created successfully.", lastVmId+1), Title: "VM Created!"})
+
+}
+
+func CloneVm(ctx iris.Context) {
+	user := ctx.Value("user")
+	print(user)
+	u, ok := user.(*models.User)
+	if !ok {
+		// Handle the case where the type assertion fails
+		fmt.Println("User is not of type *model.User")
+		ctx.Problem(iris.NewProblem().
+			Key("success", false).
+			Key("message", "User is not of type *model.User").
+			Status(iris.StatusInternalServerError))
+		return
+	}
+	if client == nil {
+		Init()
+	}
+
+	node, err := client.Node(context.Background(), os.Getenv("PROXMOX_NODE"))
+
+	if err != nil {
+		ctx.Problem(iris.NewProblem().
+			Detail(err.Error()).
+			Key("success", false).
+			Key("message", "Internal Server Error1").
+			Status(iris.StatusInternalServerError))
+		return
+	}
+
+	vms, err := node.VirtualMachines(context.Background())
+	if err != nil {
+		ctx.StopWithError(iris.StatusBadRequest, err)
+		return
+	}
+	lastVmId := 0
+	for _, v := range vms {
+		if v.VMID > proxmox.StringOrUint64(lastVmId) {
+			lastVmId = int(v.VMID)
+		}
+	}
+
+	vm, err := node.VirtualMachine(context.Background(), 100)
+
+	if err != nil {
+		ctx.Problem(iris.NewProblem().
+			Detail(err.Error()).
+			Key("success", false).
+			Key("message", "Internal Server Error2").
+			Status(iris.StatusInternalServerError))
+		return
+	}
+	params := proxmox.VirtualMachineCloneOptions{
+		NewID: lastVmId + 1,
+		Name:  fmt.Sprintf("%s-VM%d", u.Username, lastVmId+1),
+	}
+
+	newId, t, err := vm.Clone(context.Background(), &params)
+	if err != nil {
+		ctx.Problem(iris.NewProblem().
+			Detail(err.Error()).
+			Key("success", false).
+			Key("message", "Internal Server Error2").
+			Status(iris.StatusInternalServerError))
+		return
+	}
+	t.Wait(context.Background(), time.Second*1, time.Second*20)
+
+	newVM, err := node.VirtualMachine(context.Background(), newId)
+
+	if err != nil {
+		ctx.Problem(iris.NewProblem().
+			Detail(err.Error()).
+			Key("success", false).
+			Key("message", "Internal Server Error - Creation Failed").
+			Status(iris.StatusInternalServerError))
+		return
+	}
+	t, err = newVM.Start(context.Background())
+	if err != nil {
+		ctx.Problem(iris.NewProblem().
+			Detail(err.Error()).
+			Key("success", false).
+			Key("message", "Internal Server Error - VM not started").
+			Status(iris.StatusInternalServerError))
+		return
+	}
+	t.Wait(context.Background(), time.Second*1, time.Second*5)
+
+	ctx.JSON(responses.CommonResponse{Success: true, Data: newId, Message: "Please a moment. Your Vm is creating now...", Title: "Initalizing...", Detail: fmt.Sprintf("Your vm is creating %d...", newId)})
 
 }
 
@@ -320,11 +423,12 @@ func InstallDappster(ctx iris.Context) {
 	}
 
 	// pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "curl 10.69.12.99:8080 | sudo bash")
-	pid2, err := vm.AgentExec(context.Background(), []string{"bash"}, "wget -qO- http://get.dappster.io:8080/ | sudo bash")
+	pid2, err := vm.AgentExec(context.Background(), []string{"bash"}, "curl -fsSL http://get.dappster.io:8080/ | sudo bash")
 
-	// s2, err := vm.WaitForAgentExecExit(context.Background(), pid2, 1800)
-	// fmt.Println(s2)
+	s2, err := vm.WaitForAgentExecExit(context.Background(), pid2, 3600)
+	fmt.Println(s2)
 	fmt.Println(pid2)
+	fmt.Println(err)
 	if err != nil {
 
 		pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "sudo mv /etc/apt/sources.list /etc/apt/sources.list.backup && sudo touch /etc/apt/sources.list")

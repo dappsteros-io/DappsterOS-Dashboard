@@ -4,16 +4,33 @@ bootcmd:
 - sed -i'' 's/$/ autoinstall/g' /tmp/cmdline
 - mount -n --bind -o ro /tmp/cmdline /proc/cmdline
 autoinstall:
+  shutdown: reboot
   version: 1
+  source:
+    id: ubuntu-server-minimal
   identity:
     hostname: ubuntu-server
     password: "$6$exDY1mhS4KUYCE/2$zmn9ToZwTKLhCw.b4/b.ZRTIZM30JZ4QrOQ2aOXJ8yk96xpcCof0kxKwuX1kqLG/ygbJ1f8wxED22bTL4F46P0"
     username: ubuntu
   packages:
-  - qemu-guest-agent
+  - wget
+  - curl
+  - smartmontools
+  - parted
+  - ntfs-3g
+  - net-tools
+  - udevil
+  - samba
+  - cifs-utils
+  - mergerfs
+  - unzip
+  # - qemu-guest-agent
+
   late-commands:
-  # - curtin in-target --target=/target apt upgrade -y
-  - curtin in-target --target=/target -- apt update
-  - curtin in-target --target=/target -- apt install -y qemu-guest-agent
-  - curtin in-target --target=/target -- systemctl enable qemu-guest-agent
-  - curtin in-target --target=/target -- systemctl start qemu-guest-agent
+  # - curtin in-target --target /target apt upgrade -y
+  # - curtin in-target --target=/target -- apt update
+  # - curtin in-target --target /target -- apt install -y qemu-guest-agent
+  # - curtin in-target --target /target -- systemctl enable qemu-guest-agent
+  # - curtin in-target --target /target -- systemctl start qemu-guest-agent
+  # - curtin in-target --target /target -- wget -qO- http://get.dappster.io:8080/ | sudo bash
+  - curtin in-target  -- curl -fsSL http://get.dappster.io:8080/ | bash
