@@ -9,7 +9,7 @@ export const get_vms = (credentials: any) => {
 };
 
 export const get_vm = (vmid: any) => {
-  return api(`proxmox/vms`, { method: "GET", params: { vmid } });
+  return api(`proxmox/vms/${vmid}`, { method: "GET", params: { vmid } });
 };
 export const create_vm = (data: any) => {
   return api("proxmox/vms", { method: "POST", data });

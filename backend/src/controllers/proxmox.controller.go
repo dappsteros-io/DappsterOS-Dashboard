@@ -385,10 +385,8 @@ func CloneVm(ctx iris.Context) {
 			Status(iris.StatusInternalServerError))
 		return
 	}
-	t.Wait(context.Background(), time.Second*1, time.Second*5)
 
 	ctx.JSON(responses.CommonResponse{Success: true, Data: newId, Message: "Please a moment. Your Vm is creating now...", Title: "Initalizing...", Detail: fmt.Sprintf("Your vm is creating %d...", newId)})
-
 }
 
 func InstallDappster(ctx iris.Context) {
@@ -431,20 +429,28 @@ func InstallDappster(ctx iris.Context) {
 	}
 
 	// pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "curl 10.69.12.99:8080 | sudo bash")
-	pid2, err := vm.AgentExec(context.Background(), []string{"bash"}, "curl -fsSL http://get.dappster.io:8080/ | sudo bash")
+	pid2, err := vm.AgentExec(context.Background(), []string{"sudo", "wget", "-O", "dappsterinstall.sh", "http://get.dappster.io:8080/"}, "")
 
-	s2, err := vm.WaitForAgentExecExit(context.Background(), pid2, 3600)
+	s2, err := vm.WaitForAgentExecExit(context.Background(), pid2, 60)
 	fmt.Println(s2)
+
+	pid2, err = vm.AgentExec(context.Background(), []string{"sudo", "bash", "dappsterinstall.sh"}, "")
+	// pid2, err := vm.AgentExec(context.Background(), []string{"wget", "-qO-", "http://get.dappster.io:8080/", "|", "sudo", "bash"}, "")
+
+	// s2, err = vm.WaitForAgentExecExit(context.Background(), pid2, 5)
+	// fmt.Println(s2)
 	fmt.Println(pid2)
+	fmt.Println("======err======")
 	fmt.Println(err)
+	fmt.Println("======err======")
 	if err != nil {
 
-		pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "sudo mv /etc/apt/sources.list /etc/apt/sources.list.backup && sudo touch /etc/apt/sources.list")
-		s, err := vm.WaitForAgentExecExit(context.Background(), pid, 1800)
-		fmt.Println(s)
+		// pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "sudo mv /etc/apt/sources.list /etc/apt/sources.list.backup && sudo touch /etc/apt/sources.list")
+		// s, err := vm.WaitForAgentExecExit(context.Background(), pid, 1800)
+		// fmt.Println(s)
 
-		pid, err = vm.AgentExec(context.Background(), []string{"bash"}, "sudo rm -f /var/lib/dpkg/lock-frontend")
-		s, err = vm.WaitForAgentExecExit(context.Background(), pid, 1800)
+		pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "sudo rm -f /var/lib/dpkg/lock-frontend")
+		s, err := vm.WaitForAgentExecExit(context.Background(), pid, 1800)
 		fmt.Println(s)
 
 		pid, err = vm.AgentExec(context.Background(), []string{"bash"}, "sudo rm -f /var/lib/dpkg/lock")
@@ -472,7 +478,8 @@ func InstallDappster(ctx iris.Context) {
 		// pid, err := vm.AgentExec(context.Background(), []string{"bash"}, "curl 10.69.12.99:8080 | sudo bash")
 		pid2, err := vm.AgentExec(context.Background(), []string{"bash"}, "sudo rm -rf /tmp/dappster-installer/")
 
-		pid2, err = vm.AgentExec(context.Background(), []string{"bash"}, "wget -qO- http://get.dappster.io:8080/ | sudo bash")
+		// pid2, err = vm.AgentExec(context.Background(), []string{"bash"}, "wget -qO- http://get.dappster.io:8080/ | sudo bash")
+		pid2, err = vm.AgentExec(context.Background(), []string{"sudo", "bash", "dappsterinstall.sh"}, "")
 
 		// s2, err := vm.WaitForAgentExecExit(context.Background(), pid2, 1800)
 		// fmt.Println(s2)
@@ -527,7 +534,7 @@ func GetDappsterStatus(ctx iris.Context) {
 	s, err := vm.AgentExecStatus(context.Background(), pid)
 	fmt.Println(s)
 	fmt.Println(pid)
-
+	iface, err := vm.AgentGetNetworkIFaces(context.Background())
 	if err != nil {
 		ctx.Problem(iris.NewProblem().
 			Detail(err.Error()).
@@ -548,6 +555,7 @@ func GetDappsterStatus(ctx iris.Context) {
 			Status(iris.StatusInternalServerError))
 		return
 	}
+	result["iface"] = iface
 	ctx.JSON(responses.CommonResponse{Success: true, Data: result, Message: fmt.Sprintf("DappsterOS is running on %s", vm.Name), Title: "DappsterOS Running", Detail: fmt.Sprintf("DappsterOS is running on %s", vm.Name)})
 
 }

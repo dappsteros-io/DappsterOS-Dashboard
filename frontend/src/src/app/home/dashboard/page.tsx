@@ -34,6 +34,7 @@ import {
   createVM,
   installDappster,
   checkDappster,
+  getVM,
 } from "@/store/proxmox/actions";
 import { NodeData, VMData } from "@/types/proxmox";
 import {
@@ -73,6 +74,8 @@ const defaultTitle = () => "Here is title";
 const defaultFooter = () => "Here is footer";
 
 const Index: React.FC = () => {
+  const [currentID, setCurrentID] = useState(0);
+  const [intervalID, setIntervalID] = useState<NodeJS.Timeout | number | 0>(0);
   const [bordered, setBordered] = useState(false);
   const [loading, setLoading] = useState(false);
   const [size, setSize] = useState<SizeType>("large");
@@ -216,6 +219,9 @@ const Index: React.FC = () => {
   };
 
   const onDeleteVM = (vmid: number) => {
+    if (vmid == currentID) {
+      setCurrentID(0);
+    }
     dispatch(deleteVM(vmid)).then((res) => {
       setLoading(true);
       onRefresh();
@@ -224,6 +230,9 @@ const Index: React.FC = () => {
 
   const onInstallDappsterOS = (vmid: number) => {
     setLoading(true);
+    if (intervalID) {
+      clearInterval(intervalID);
+    }
     dispatch(installDappster(vmid)).then((res) => {
       setLoading(false);
       onRefresh();
@@ -235,6 +244,16 @@ const Index: React.FC = () => {
     dispatch(checkDappster(vmid)).then((res) => {
       setLoading(false);
       // onRefresh();
+      message.info(
+        <pre className="text-left">
+          {JSON.stringify(
+            res.payload.data.iface.find((i: any) => i.name.includes("eth0")) ??
+              {},
+            null,
+            2
+          )}
+        </pre>
+      );
     });
   };
   const confirm: PopconfirmProps["onConfirm"] = (e) => {
@@ -263,16 +282,24 @@ const Index: React.FC = () => {
   const onRefresh = () => {
     setLoading(true);
     dispatch(getVMs({})).then((res) => {
+      console.log(res.payload);
       setLoading(false);
     });
   };
 
   const onCreateVM = () => {
     setLoading(true);
-    dispatch(createVM({})).then((res) => {
-      setLoading(false);
-      onRefresh();
-    });
+    dispatch(createVM({}))
+      .then((res) => {
+        console.log(res.payload);
+        if (res.meta.requestStatus == "fulfilled") {
+          setCurrentID(res.payload.data);
+        }
+        onRefresh();
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -285,7 +312,21 @@ const Index: React.FC = () => {
       setLoading(false);
     });
   }, []);
-
+  useEffect(() => {
+    console.log({ currentID });
+    if (currentID > 0) {
+      const i = setInterval(() => {
+        dispatch(getVM(currentID)).then((res) => {
+          console.log(res.payload);
+          if (res.payload.data.Uptime > 120) {
+            onInstallDappsterOS(currentID);
+            clearInterval(i);
+          }
+        });
+      }, 5000);
+      setIntervalID(i);
+    }
+  }, [currentID]);
   return (
     <div className="w-full text-lg text-center p-4">
       <Flex flex={1} gap={4}>
